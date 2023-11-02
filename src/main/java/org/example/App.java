@@ -12,11 +12,15 @@ public class App
 {
     public static void main( String[] args )
     {
-        TelegramBot telegramBot = new TelegramBot(System.getenv("BOT_TG_NAME"), System.getenv("BOT_TG_TOKEN"));
-        VkBot vkBot = new VkBot(System.getenv("BOT_VK_ID"), System.getenv("BOT_VK_TOKEN"));
+        runAllBots();
+    }
 
-        System.out.println(telegramBot.getConfig());
-        System.out.println(vkBot.getConfig());
-        System.out.println(telegramBot.formatResponse("test messaging"));
+    private static void runAllBots() {
+        BotConfig tgConfig = new BotConfig(System.getenv("BOT_TG_NAME"), System.getenv("BOT_TG_TOKEN"));
+        BotConfig vkConfig = new BotConfig(System.getenv("BOT_VK_ID"), System.getenv("BOT_VK_TOKEN"));
+        TelegramBot telegramBot = new TelegramBot(tgConfig);
+        telegramBot.run();
+        VkBot vkBot = new VkBot(vkConfig);
+        vkBot.run();
     }
 }
