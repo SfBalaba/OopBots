@@ -7,7 +7,7 @@ public interface BotInterface {
     /**
      * запускает бота
      */
-    abstract void run();
+    abstract public void run();
 
 
     default String formatResponse(String textMrssage){

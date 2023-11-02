@@ -19,10 +19,10 @@ import java.util.Random;
  */
 public class VkBot implements BotInterface {
     private BotConfig config;
-    GroupActor actor;
-    VkApiClient vk;
-    Integer ts;
-    Random random;
+    private GroupActor actor;
+    private VkApiClient vk;
+    private Integer ts;
+    private Random random;
     public VkBot(BotConfig config) {
         this.config = config;
         TransportClient transportClient = new HttpTransportClient();
