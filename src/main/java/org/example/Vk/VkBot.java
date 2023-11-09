@@ -23,11 +23,26 @@ public class VkBot implements Bot {
      * реализует логику vk бота
      */
     private final Logic logic;
-    private BotConfig config;
-    private GroupActor actor;
-    private VkApiClient vk;
+    /**
+     * конфигурация бота
+     */
+    private final BotConfig config;
+    /**
+     * объект сообщества, именно оно отвечает на запросы(сообщения)
+     */
+    private final GroupActor actor;
+    /**
+     * объект транспортного клиента
+     */
+    private final VkApiClient vk;
+    /**
+     * сонхронизация запросов
+     */
     private Integer ts;
-    private Random random;
+    /**
+     * объект случайной генерации
+     */
+    private final Random random;
     public VkBot(BotConfig config) {
         this.config = config;
         TransportClient transportClient = new HttpTransportClient();

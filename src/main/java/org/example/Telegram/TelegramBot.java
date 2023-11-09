@@ -21,6 +21,9 @@ public class TelegramBot extends TelegramLongPollingBot implements Bot {
      * реализует логику телеграм бота
      */
     private final Logic logic;
+    /**
+     * конфигурация бота
+     */
     private final BotConfig config;
 
     public TelegramBot(BotConfig config) {
@@ -28,11 +31,17 @@ public class TelegramBot extends TelegramLongPollingBot implements Bot {
         this.logic = new Logic();
     }
 
+    /**
+     * @return имя бота
+     */
     @Override
     public String getBotUsername() {
         return this.config.getBotName();
     }
 
+    /**
+     * @return токен бота
+     */
     @Override
     public String getBotToken() {
         return this.config.getToken();
