@@ -8,8 +8,9 @@ import com.vk.api.sdk.exceptions.ClientException;
 import com.vk.api.sdk.httpclient.HttpTransportClient;
 import com.vk.api.sdk.objects.messages.Message;
 import com.vk.api.sdk.queries.messages.MessagesGetLongPollHistoryQuery;
-import org.example.BotInterface;
+import org.example.Bot;
 import org.example.config.BotConfig;
+import org.example.logic.Logic;
 
 import java.util.List;
 import java.util.Random;
@@ -17,7 +18,11 @@ import java.util.Random;
 /**
  * класс VK бота
  */
-public class VkBot implements BotInterface {
+public class VkBot implements Bot {
+    /**
+     * реализует логику vk бота
+     */
+    private final Logic logic;
     private BotConfig config;
     private GroupActor actor;
     private VkApiClient vk;
@@ -27,7 +32,7 @@ public class VkBot implements BotInterface {
         this.config = config;
         TransportClient transportClient = new HttpTransportClient();
         this.vk = new VkApiClient(transportClient);
-
+        logic = new Logic();
         try {
             this.actor = new GroupActor(Integer.valueOf(config.getBotName()), config.getToken());
             this.ts = vk.messages().getLongPollServer(actor).execute().getTs();
@@ -36,8 +41,23 @@ public class VkBot implements BotInterface {
         }
         this.random = new Random();
     }
+
+
     /**
-     * {@inheritDoc}
+     * @return историю запросов в json формате
+     * очередь запросов
+     */
+    private List<Message> getMessages() {
+        MessagesGetLongPollHistoryQuery historyQuery =  vk.messages().getLongPollHistory(actor).ts(ts);
+        try {
+            return historyQuery.execute().getMessages().getItems();
+        } catch (ApiException | ClientException e) {e.printStackTrace();}
+        return null;
+    }
+
+    /**
+     * <p>{@inheritDoc}</p>
+     * <p>Отслеживает новые сообщения от пользователя и реализует логику</p>
      */
     @Override
     public void run() {
@@ -45,8 +65,8 @@ public class VkBot implements BotInterface {
             List<Message> messages = getMessages();
             if (messages != null && !messages.isEmpty()) {
                 messages.forEach(message -> {
-                    String response = formatResponse(message.getText());
-                    sendText(message, response);
+                    String response = logic.handleMessage(message.getText());
+                    sendText(message.getFromId().longValue(), response);
                 });
             }
             try {
@@ -62,25 +82,15 @@ public class VkBot implements BotInterface {
     }
 
     /**
-     * @return историю запросов в json формате
-     */
-    private List<Message> getMessages() {
-        MessagesGetLongPollHistoryQuery historyQuery =  vk.messages().getLongPollHistory(actor).ts(ts);
-        try {
-            return historyQuery.execute().getMessages().getItems();
-        } catch (ApiException | ClientException e) {e.printStackTrace();}
-        return null;
-    }
-
-    /**
-     * оправляет пользователю ответ
+     * {@inheritDoc}
      * @param response форматированный ответ
      */
-    private void sendText(Message message, String response) {
+    @Override
+    public void sendText(Long chatId, String response) {
         try {
             vk.messages().send(actor).
                     message(response).
-                    userId(message.getFromId()).
+                    userId(chatId.intValue()).
                     randomId(random.nextInt(10000)).
                     execute();
         } catch (ApiException | ClientException e) {
@@ -88,10 +98,4 @@ public class VkBot implements BotInterface {
         }
     }
 
-    @Override
-    public String toString() {
-        return "VkBot{" +
-                "config=" + config +
-                '}';
-    }
 }

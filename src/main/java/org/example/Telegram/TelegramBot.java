@@ -1,27 +1,52 @@
 package org.example.Telegram;
 
 
-import org.example.BotInterface;
+import org.example.Bot;
 import org.example.config.BotConfig;
+import org.example.logic.Logic;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
-import org.telegram.telegrambots.meta.generics.LongPollingBot;
 import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 
 /**
  * класс телеграм бота
  */
-public class TelegramBot extends TelegramLongPollingBot implements BotInterface {
+public class TelegramBot extends TelegramLongPollingBot implements Bot {
 
-
+    /**
+     * реализует логику телеграм бота
+     */
+    private final Logic logic;
     private final BotConfig config;
 
     public TelegramBot(BotConfig config) {
         this.config = config;
+        this.logic = new Logic();
+    }
+
+    @Override
+    public String getBotUsername() {
+        return this.config.getBotName();
+    }
+
+    @Override
+    public String getBotToken() {
+        return this.config.getToken();
+    }
+
+    /**
+     * Отслеживает событие и отвечает на него в соответсвии логике
+     * @param update объект, хранящий в себе информацию о происходящих событиях
+     */
+    @Override
+    public void onUpdateReceived(Update update) {
+        Message msg = update.getMessage();
+        String response = logic.handleMessage(msg.getText());
+        sendText(msg.getFrom().getId(), response);
     }
 
     /**
@@ -37,24 +62,11 @@ public class TelegramBot extends TelegramLongPollingBot implements BotInterface 
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public String getBotUsername() {
-        return this.config.getBotName();
-    }
-
-    @Override
-    public String getBotToken() {
-        return this.config.getToken();
-    }
-
-    @Override
-    public void onUpdateReceived(Update update) {
-        Message msg = update.getMessage();
-        String response = formatResponse(msg.getText());
-        sendText(msg.getFrom().getId(), response);
-    }
-
-    private void sendText(Long userId, String message){
+    public void sendText(Long userId, String message){
         SendMessage sm = SendMessage.builder()
                 .chatId(userId.toString())
                 .text(message).build();
@@ -65,10 +77,5 @@ public class TelegramBot extends TelegramLongPollingBot implements BotInterface 
         }
     }
 
-    @Override
-    public String toString() {
-        return "TelegramBot{" +
-                "config=" + config +
-                '}';
-    }
+
 }
