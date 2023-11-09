@@ -9,8 +9,6 @@ package org.example.config;
 public class BotConfig {
 
     private final String botName;
-
-
     private final String token;
 
     public BotConfig(String botName, String token) {
@@ -24,13 +22,5 @@ public class BotConfig {
 
     public String getToken() {
         return token;
-    }
-
-    @Override
-    public String toString() {
-        return "BotConfig{" +
-                "botName='" + botName + '\'' +
-                ", token='" + token + '\'' +
-                '}';
     }
 }
