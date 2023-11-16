@@ -20,7 +20,7 @@ import java.util.Random;
  */
 public class VkBot implements Bot {
     /**
-     * реализует логику vk бота
+     * Реализует логику бота
      */
     private final Logic logic;
     /**
@@ -43,8 +43,9 @@ public class VkBot implements Bot {
      * объект случайной генерации
      */
     private final Random random;
-    public VkBot(BotConfig config) {
+    public VkBot(BotConfig config, Logic logic) {
         this.config = config;
+        this.logic = logic;
         TransportClient transportClient = new HttpTransportClient();
         this.vk = new VkApiClient(transportClient);
         logic = new Logic();
@@ -71,11 +72,10 @@ public class VkBot implements Bot {
     }
 
     /**
-     * <p>{@inheritDoc}</p>
+     * <p>Запускает бота</p>
      * <p>Отслеживает новые сообщения от пользователя и реализует логику</p>
      */
-    @Override
-    public void run() {
+    public void listenForMessages() {
         while (true) {
             List<Message> messages = getMessages();
             if (messages != null && !messages.isEmpty()) {

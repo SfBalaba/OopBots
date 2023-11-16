@@ -18,7 +18,7 @@ import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 public class TelegramBot extends TelegramLongPollingBot implements Bot {
 
     /**
-     * реализует логику телеграм бота
+     * реализует логику бота
      */
     private final Logic logic;
     /**
@@ -26,9 +26,9 @@ public class TelegramBot extends TelegramLongPollingBot implements Bot {
      */
     private final BotConfig config;
 
-    public TelegramBot(BotConfig config) {
+    public TelegramBot(BotConfig config, Logic logic) {
         this.config = config;
-        this.logic = new Logic();
+        this.logic = logic;
     }
 
     /**
@@ -59,10 +59,9 @@ public class TelegramBot extends TelegramLongPollingBot implements Bot {
     }
 
     /**
-     * {@inheritDoc}
+     * <p>Запускает бота</p>
      */
-    @Override
-    public void run() {
+    public void startBot() {
         try {
             TelegramBotsApi botsApi = new TelegramBotsApi(DefaultBotSession.class);
             botsApi.registerBot(this);
